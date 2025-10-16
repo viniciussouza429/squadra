@@ -9,6 +9,15 @@ export interface RegisterPayload {
 }
 
 /**
+ * 🎯 NOVA INTERFACE: Define a estrutura de dados para o formulário de LOGIN.
+ * Requer apenas email e password.
+ */
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+/**
  * Define a estrutura básica do usuário que retorna do servidor.
  * Note que a senha (password) NUNCA é incluída.
  */

@@ -2,12 +2,11 @@
 
 import { NextResponse } from "next/server";
 // Importação do bcrypt (versão nativa que funciona no seu sistema)
-import * as bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 // Importação do cliente Prisma que está agora isolado em src/lib/prisma.ts
 import prisma from "@/lib/prisma";
 // Importação dos tipos de erro para o tratamento correto
-import { Prisma, PrismaClientKnownRequestError } from "@prisma/client";
-
+import { Prisma } from "@prisma/client";
 export async function POST(request: Request) {
   try {
     // 1. LER DADOS DO FRONTEND
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
   } catch (error) {
     // 5. TRATAMENTO DE ERRO AVANÇADO (E-mail Duplicado)
     if (
-      error instanceof PrismaClientKnownRequestError &&
+      error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
       return NextResponse.json(

@@ -1,0 +1,32 @@
+// Define o cliente (o ORM)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Define o banco de dados e a conexão
+datasource db {
+  provider = "postgresql"
+  // A URL de conexão será lida do seu arquivo .env
+  url      = env("DATABASE_URL")
+}
+
+// =========================================================
+// MODELOS DE DADOS PARA O SQUADRA
+// =========================================================
+
+model User {
+  // Chave Primária, gerada automaticamente como um UUID (String)
+  id          String    @id @default(uuid()) 
+  
+  // Login do usuário. O @unique garante que não haja e-mails duplicados.
+  email       String    @unique 
+  
+  // Senha: Armazenará o HASH criptografado (gerado pelo Bcrypt)
+  password    String
+  
+  // Nome completo do usuário
+  name        String
+  
+  // Timestamp: Define a data de criação do registro
+  createdAt   DateTime  @default(now())
+}

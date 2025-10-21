@@ -1,62 +1,58 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth"; // Usa 'type NextAuthOptions' para tipagem
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter"; // Adaptador oficial para Prisma
-import prisma from "@/lib/prisma"; // Seu cliente Prisma
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import prisma from "@/lib/prisma";
+import { type Session } from "next-auth"; // Tipos de sessão
+import { type JWT } from "next-auth/jwt"; // Tipos de token JWT
 
-// 🛑 VARIÁVEIS DE AMBIENTE CRÍTICAS 🛑
-// Lidas automaticamente pelo Next.js no Backend
+// Variáveis de ambiente CRÍTICAS
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET; // CRÍTICO para segurança de sessão
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
 
-// Verificação de segurança (Opcional, mas bom)
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !NEXTAUTH_SECRET) {
-  // Em produção, isso garante que o build falhe se as chaves estiverem faltando
-  console.error(
-    "ERRO: Uma ou mais variáveis de ambiente críticas (Google ID/Secret ou NEXTAUTH_SECRET) não estão definidas."
-  );
-}
+// 🛑 A ESTRUTURA DE CONFIGURAÇÃO DO AUTH.JS
+export const authOptions: NextAuthOptions = {
+  // Tipagem completa
 
-export const authOptions = {
-  // 1. ADAPTADOR: Usa o seu Prisma Client para gerenciar as tabelas de Auth
+  // 1. ADAPTADOR: Conecta o Auth.js ao PostgreSQL/Prisma
   adapter: PrismaAdapter(prisma),
 
-  // Chave de segurança para criptografar os tokens de sessão (CRÍTICO)
+  // 2. CHAVE DE SEGURANÇA: CRÍTICO para segurança
   secret: NEXTAUTH_SECRET,
 
-  // 2. PROVEDORES: Configura a opção de login com Google
+  // 3. PROVEDORES: Configuração do Google
   providers: [
     GoogleProvider({
-      clientId: GOOGLE_CLIENT_ID || "", // Usa a variável ou string vazia se undefined (o que causaria um erro seguro)
+      clientId: GOOGLE_CLIENT_ID || "",
       clientSecret: GOOGLE_CLIENT_SECRET || "",
     }),
   ],
 
-  // 3. SESSÃO: Usa JWT (melhor para Serverless functions)
+  // 4. SESSÃO: Usa JWT para o gerenciamento de sessão
   session: {
     strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
 
-  // 4. PÁGINAS: Define para onde redirecionar o usuário
+  // 5. PÁGINAS: Redirecionamentos
   pages: {
-    signIn: "/login", // Redireciona para sua página /login
+    signIn: "/login",
   },
 
-  // 5. CALLBACKS: Adiciona o ID do DB ao token JWT para acesso fácil
+  // 6. CALLBACKS: Adiciona o ID do usuário ao objeto Session (CORREÇÃO DE TIPAGEM)
   callbacks: {
-    async session({ session, token }: { session: any; token: any }) {
+    // 🎯 CORREÇÃO FINAL: Usa os tipos Session e JWT importados, removendo o 'any'.
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        session.user.id = token.sub; // token.sub é o ID do usuário no DB
+        // token.sub contém o ID do usuário no DB, que o Prisma insere
+        session.user.id = token.sub;
       }
       return session;
     },
   },
 };
 
-// 6. CRIA O HANDLER PRINCIPAL
+// 7. EXPORTAÇÃO FINAL: Cria o Handler e o exporta para GET e POST
 const handler = NextAuth(authOptions);
 
-// 7. 🎯 CORREÇÃO FINAL: EXPORTAÇÃO NOMEADA PARA GET/POST
-// Isso resolve o erro "No HTTP methods exported..."
 export { handler as GET, handler as POST };

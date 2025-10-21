@@ -33,7 +33,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        session.user.id = token.sub;
+        // 🎯 CORREÇÃO: Verifica se o token existe E se o token.sub existe
+        if (token.sub) {
+          // O tipo de 'session.user.id' no auth.d.ts é 'string',
+          // e aqui garantimos que o valor a ser atribuído também é 'string'.
+          session.user.id = token.sub;
+        }
       }
       return session;
     },

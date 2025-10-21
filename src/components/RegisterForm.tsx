@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { RegisterPayload } from "@/types/auth"; // Importa a interface que você definiu
+import { useRouter } from "next/navigation";
 
 function RegisterForm() {
   // Estado único para os dados do formulário (tipado!)
@@ -13,6 +14,12 @@ function RegisterForm() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false); // Estado para o botão
+
+  const [mensagem, setMensagem] = useState("");
+
+  const [type, setType] = useState("");
+
+  const router = useRouter();
 
   // Manipulador de submissão do formulário
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,17 +41,25 @@ function RegisterForm() {
 
       if (response.ok) {
         // Sucesso: Status 201
-        alert("Cadastro realizado com sucesso! Faça login.");
+        setMensagem("Cadastro realizado com sucesso! Faça login.");
+        setType("SUCESSO");
+        //alert("Cadastro realizado com sucesso! Faça login.");
         console.log("Registro bem-sucedido:", data);
         // Futuramente: Redirecionar para a página de Login
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
       } else {
         // Erro: 400 (Bad Request), 409 (Conflict/Email já existe), etc.
         console.error("Erro no registro:", data.error);
-        alert(data.error || "Falha ao registrar. Tente novamente.");
+        setMensagem(data.error);
+        setType("ERRO");
       }
     } catch (error) {
       console.error("Erro de conexão no servidor:", error);
-      alert("Erro de conexão. Verifique o servidor.");
+      setMensagem("Erro de conexão. Verifique o servidor.");
+      setType("ERRO");
+      //alert("Erro de conexão. Verifique o servidor.");
     } finally {
       setIsLoading(false);
     }
@@ -133,6 +148,18 @@ function RegisterForm() {
       >
         {isLoading ? "Registrando..." : "Registrar"}
       </button>
+
+      {mensagem && (
+        <p
+          style={{
+            color: type === "SUCESSO" ? "green" : "red",
+            marginTop: "8px",
+            fontWeight: "bold",
+          }}
+        >
+          {mensagem}
+        </p>
+      )}
     </form>
   );
 }

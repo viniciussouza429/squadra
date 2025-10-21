@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
 // Importação dos tipos de erro para o tratamento correto
 import { Prisma } from "@prisma/client";
+
 export async function POST(request: Request) {
   try {
     // 1. LER DADOS DO FRONTEND

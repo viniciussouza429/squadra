@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Hook para redirecionar o usuário
 import { LoginPayload } from "@/types/auth"; // Usaremos LoginPayload, similar ao RegisterPayload
+import GoogleSignInButton from "./GoogleSignInButton";
 
 function LoginForm() {
   // 🛑 Note: LoginPayload só precisa de email e password (não precisa de name)
@@ -123,6 +124,8 @@ function LoginForm() {
           Cadastre-se
         </a>
       </p>
+      <p className="text-center text-sm text-gray-400 mt-4">Ou</p>
+      <GoogleSignInButton />
     </form>
   );
 }

@@ -1,10 +1,11 @@
+// src/app/api/login/route.ts (Código Final)
+
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    // 1. LER DADOS DO FRONTEND
     const { email, password } = await request.json();
 
     // Validação básica
@@ -15,32 +16,36 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. BUSCAR O USUÁRIO PELO EMAIL
-    // findUnique busca uma única linha na tabela User onde o email é o que foi enviado
+    // 1. BUSCAR O USUÁRIO
     const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
+      where: { email },
     });
 
-    // 3. SE O USUÁRIO NÃO EXISTIR
+    // 2. 🎯 CORREÇÃO 1: CHECAR SE O OBJETO 'user' EXISTE (O PRIMEIRO NULL CHECK)
     if (!user) {
-      // Retorna um erro genérico para não dar dicas sobre qual credencial está errada.
+      // Retorna um erro genérico para segurança
       return NextResponse.json(
         { error: "Credenciais inválidas." },
         { status: 401 }
-      ); // 401 Unauthorized
+      );
     }
 
-    // 4. COMPARAR SENHAS
-    // bcrypt.compare(senha_texto_puro, hash_salvo_no_DB)
+    // 3. 🎯 CORREÇÃO 2: CHECAR SE A SENHA LOCAL EXISTE (USUÁRIO GOOGLE)
+    // Se user existe, mas user.password é null, ele deve logar pelo Google.
+    if (!user.password) {
+      return NextResponse.json(
+        {
+          error: "Este usuário deve fazer login usando a conta Google.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // 4. COMPARAR SENHAS: Agora o TypeScript sabe que user.password é uma string.
     const passwordsMatch = await bcrypt.compare(password, user.password);
 
     // 5. SE AS SENHAS BATEREM
     if (passwordsMatch) {
-      // No futuro: Você criará um Token JWT aqui (JSON Web Token)
-
-      // Retorno de Sucesso (sem a senha!)
       return NextResponse.json(
         {
           message: "Login bem-sucedido!",
@@ -51,7 +56,6 @@ export async function POST(request: Request) {
     }
 
     // 6. SE AS SENHAS NÃO BATEREM
-    // Retorna o mesmo erro genérico para segurança.
     return NextResponse.json(
       { error: "Credenciais inválidas." },
       { status: 401 }

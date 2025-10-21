@@ -32,13 +32,16 @@ export const authOptions: NextAuthOptions = {
   // 🎯 Correção do erro 'any'
   callbacks: {
     async session({ session, token }: { session: Session; token: JWT }) {
-      if (session.user) {
-        // 🎯 CORREÇÃO: Verifica se o token existe E se o token.sub existe
-        if (token.sub) {
-          // O tipo de 'session.user.id' no auth.d.ts é 'string',
-          // e aqui garantimos que o valor a ser atribuído também é 'string'.
-          session.user.id = token.sub;
-        }
+      // Checa se o token existe e se o usuário na sessão existe
+      if (session.user && token.sub) {
+        // 🎯 SOLUÇÃO FINAL: Força o TypeScript a reconhecer o ID
+        // e atribui o token.sub (que é o ID do usuário no DB).
+
+        // O tipo 'session.user' não tem 'id' por padrão. Vamos adicionar:
+        (session.user as { id: string }).id = token.sub;
+
+        // OU, a forma mais simples (se a versão do NextAuth permitir o cast implícito):
+        // session.user.id = token.sub; // E a correção está no auth.d.ts
       }
       return session;
     },

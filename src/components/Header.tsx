@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+import MobileMenu from "./MobileMenu";
 
 function Header() {
   return (
@@ -17,7 +18,7 @@ function Header() {
         </Link>
 
         {/* Navegação Principal */}
-        <nav className="flex space-x-6">
+        <nav className="hidden md:flex space-x-6">
           {/* Link para a Home Page */}
           <Link
             href="/"
@@ -49,6 +50,11 @@ function Header() {
             </button>
           </Link>
         </nav>
+
+        <div className="md:hidden">
+          {/* 🎯 AQUI ENTRA O SEU BOTÃO HAMBURGER E O MENU */}
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );

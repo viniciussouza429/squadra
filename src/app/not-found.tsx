@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { Metadata } from "next";
-import { headers } from "next/headers";
+// 🛑 REMOVER: import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: "Página Não Encontrada | Squadra",
 };
 
-// 🎯 CORREÇÃO 1: Adicione 'async' ao componente
-export default async function NotFound() {
-  // 🎯 CORREÇÃO 2: A chamada à função 'headers()' deve ser resolvida com 'await'
-  const headersList = headers();
-  const pathname = headersList.get("x-invoke-path") || "rota desconhecida";
+// 🎯 CORREÇÃO: Removemos o 'async' e a chamada à headersList
+export default function NotFound() {
+  // A variável pathname que estava causando o erro é removida.
 
   return (
     // ... (restante do JSX) ...
@@ -24,8 +22,7 @@ export default async function NotFound() {
       </h2>
 
       <p className="text-gray-400 mb-6 max-w-lg text-center">
-        O recurso solicitado ({pathname}) não foi encontrado ou ainda está sendo
-        construído.
+        O recurso solicitado não foi encontrado ou ainda está sendo construído.
       </p>
 
       <Link href="/" passHref>

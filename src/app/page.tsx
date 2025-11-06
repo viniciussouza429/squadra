@@ -3,14 +3,14 @@
 function HomePage() {
   return (
     // Usa flexbox e classes de altura total para centralizar o conteúdo
-    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-8 text-center text-white">
+    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-5 text-center text-white">
       {/* Título Principal */}
-      <h1 className="text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600">
+      <h1 className="text-6xl font-extrabold mb-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600">
         Squadra: Gestão de Projetos
       </h1>
 
       {/* Subtítulo / Missão */}
-      <p className="text-xl max-w-2xl mb-8 text-gray-300">
+      <p className="text-xl max-w-2xl mb-5 text-gray-300">
         Organize equipes, controle tarefas e impulsione a produtividade da sua
         squad com inteligência.
       </p>

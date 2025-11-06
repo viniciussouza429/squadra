@@ -16,19 +16,23 @@ function HomePage() {
       </p>
 
       {/* Chamada para Ação */}
-      <div className="space-x-4">
-        <a
-          href="/register"
-          className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-500 transition duration-300"
-        >
-          Comece Agora
-        </a>
-        <a
-          href="/about"
-          className="px-6 py-3 bg-gray-700 text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-gray-600 transition duration-300"
-        >
-          Saiba Mais
-        </a>
+      <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 justify-between items-center max-w-7xl mx-auto gap-5">
+        <button>
+          <a
+            href="/register"
+            className="w-full text-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-500 transition duration-300"
+          >
+            Comece Agora
+          </a>
+        </button>
+        <button>
+          <a
+            href="/about"
+            className="w-full text-center px-6 py-3 bg-gray-700 text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-gray-600 transition duration-300"
+          >
+            Saiba Mais
+          </a>
+        </button>
       </div>
     </main>
   );

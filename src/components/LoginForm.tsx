@@ -1,9 +1,9 @@
-"use client"; // Obrigatório para usar Hooks (useState)
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoginPayload } from "@/types/auth";
-import { signIn } from "next-auth/react"; // 🎯 CRÍTICO: Importa a função signIn
+import { signIn } from "next-auth/react"; // 🎯 ESSENCIAL: O hook para autenticação
 import GoogleSignInButton from "./GoogleSignInButton";
 
 function LoginForm() {
@@ -12,7 +12,7 @@ function LoginForm() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Novo estado para exibir erros
+  const [error, setError] = useState<string | null>(null); // Estado para exibir erros
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,28 +20,28 @@ function LoginForm() {
     setIsLoading(true);
     setError(null);
 
+    // 🎯 CORREÇÃO CRÍTICA: SUBSTITUI O FETCH MANUAL PELO signIn DO AUTH.JS
     const result = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
-      redirect: false,
+      redirect: false, // Dizemos ao Auth.js para não redirecionar
     });
 
     setIsLoading(false);
 
     if (result?.error) {
-      // 🎯 A CORREÇÃO ESTÁ AQUI:
-      // Verificamos se o erro é o código padrão "CredentialsSignin"
+      // 🎯 TRADUZ O ERRO PADRÃO DO NEXTAUTH
       if (result.error === "CredentialsSignin") {
         setError("Email ou senha inválidos. Tente novamente.");
       } else {
-        // Se for outro erro (ex: falha de rede), exibe o erro
-        setError(result.error);
+        setError(result.error || "Falha ao fazer login. Tente novamente.");
       }
     } else if (result?.ok) {
-      // Sucesso
+      // Sucesso: A sessão foi criada, redireciona para o Dashboard
       router.push("/dashboard");
     }
   };
+
   // Função genérica para atualizar o estado
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

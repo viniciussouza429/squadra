@@ -1,4 +1,5 @@
 import AuthGuard from "@/components/AuthGuard";
+import MobileDashboardNav from "@/components/MobileDashboardNav";
 import Sidebar from "@/components/Sidebar"; // O componente Sidebar que você irá criar
 
 export default function DashboardLayout({
@@ -7,17 +8,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    // 1. 🛡️ PROTEÇÃO: Envolve a área principal com o guarda de autenticação
     <AuthGuard>
-      {/* 2. LAYOUT: Flexbox para Sidebar + Conteúdo */}
       <div className="flex min-h-screen">
-        {/* Sidebar: Fixa e Larga (ex: w-64) */}
-        <Sidebar />
+        <Sidebar /> {/* Versão Desktop (lg:flex) */}
+        <div className="flex-1 flex flex-col">
+          {/* 1. Header Mobile (o componente que você criou) */}
+          <MobileDashboardNav />
 
-        {/* Área Principal/Conteúdo: Ocupa o resto da tela (flex-1) */}
-        <main className="flex-1 p-8 overflow-y-auto">
-          {children} {/* Aqui entra o conteúdo da página dashboard/page.tsx */}
-        </main>
+          {/* 2. CONTEÚDO PRINCIPAL (Aplique o padding-top aqui) */}
+          <main className="flex-1 p-8 overflow-y-auto lg:p-8 pt-16">
+            {/* 👆 Adicionei lg:p-8 para redefinir o padding no desktop e pt-16 para mobile */}
+            {children}
+          </main>
+        </div>
       </div>
     </AuthGuard>
   );

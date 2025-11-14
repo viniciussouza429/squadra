@@ -20,26 +20,28 @@ function LoginForm() {
     setIsLoading(true);
     setError(null);
 
-    // 🎯 CORREÇÃO CRÍTICA: SUBSTITUI O FETCH MANUAL PELO signIn DO AUTH.JS
     const result = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
-      redirect: false, // Dizemos ao Auth.js para não redirecionar automaticamente
+      redirect: false,
     });
 
     setIsLoading(false);
 
     if (result?.error) {
-      // Se houver erro (Credenciais inválidas, etc.), exibe a mensagem do Auth.js
-      console.error("Login falhou:", result.error);
-      // Auth.js envia mensagens de erro na URL, vamos apenas exibir o erro.
-      setError(result.error || "Credenciais inválidas. Tente novamente.");
+      // 🎯 A CORREÇÃO ESTÁ AQUI:
+      // Verificamos se o erro é o código padrão "CredentialsSignin"
+      if (result.error === "CredentialsSignin") {
+        setError("Email ou senha inválidos. Tente novamente.");
+      } else {
+        // Se for outro erro (ex: falha de rede), exibe o erro
+        setError(result.error);
+      }
     } else if (result?.ok) {
-      // Sucesso: Se a autenticação foi bem-sucedida, o Auth.js criou a sessão.
-      router.push("/dashboard"); // Redireciona para o Dashboard
+      // Sucesso
+      router.push("/dashboard");
     }
   };
-
   // Função genérica para atualizar o estado
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

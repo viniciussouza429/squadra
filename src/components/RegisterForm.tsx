@@ -6,6 +6,7 @@ import { useState } from "react";
 import { RegisterPayload } from "@/types/auth"; // Importa a interface que você definiu
 import { useRouter } from "next/navigation";
 import GoogleSignInButton from "./GoogleSignInButton";
+import Link from "next/link";
 
 function RegisterForm() {
   // Estado único para os dados do formulário (tipado!)
@@ -161,8 +162,15 @@ function RegisterForm() {
           {mensagem}
         </p>
       )}
-      <p className="text-center text-sm text-gray-400 mt-4">Ou</p>
-      <GoogleSignInButton />
+      <p className="text-center text-sm text-gray-400 mt-4">
+        Ou,{" "}
+        <Link
+          href="/login"
+          className="text-fg-brand hover:underline text-blue-200"
+        >
+          entre de outras formas
+        </Link>
+      </p>
     </form>
   );
 }

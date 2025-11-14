@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-gray-900 text-white antialiased min-h-screen">
+      <body className="bg-neutral-950 text-white antialiased min-h-screen">
         {/* 🎯 A CORREÇÃO: O SessionProvider deve envolver todo o conteúdo */}
         <SessionProvider>{children}</SessionProvider>
       </body>

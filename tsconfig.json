@@ -24,7 +24,7 @@
       }
     ],
     //"ignoreDeprecations": "6.0", // ✅ ADICIONADA A VÍRGULA AQUI
-    "baseUrl": ".",
+    //"baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

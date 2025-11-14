@@ -1,56 +1,42 @@
-// src/components/LoginForm.tsx
-
 "use client"; // Obrigatório para usar Hooks (useState)
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Hook para redirecionar o usuário
-import { LoginPayload } from "@/types/auth"; // Usaremos LoginPayload, similar ao RegisterPayload
+import { useRouter } from "next/navigation";
+import { LoginPayload } from "@/types/auth";
+import { signIn } from "next-auth/react"; // 🎯 CRÍTICO: Importa a função signIn
 import GoogleSignInButton from "./GoogleSignInButton";
 
 function LoginForm() {
-  // 🛑 Note: LoginPayload só precisa de email e password (não precisa de name)
   const [formData, setFormData] = useState<LoginPayload>({
     email: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Hook para navegação programática
-
-  // Funções para lidar com erros e sucesso (e-mail duplicado)
+  const [error, setError] = useState<string | null>(null); // Novo estado para exibir erros
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    try {
-      // Requisição POST para o Route Handler de Login
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    // 🎯 CORREÇÃO CRÍTICA: SUBSTITUI O FETCH MANUAL PELO signIn DO AUTH.JS
+    const result = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false, // Dizemos ao Auth.js para não redirecionar automaticamente
+    });
 
-      const data = await response.json();
+    setIsLoading(false);
 
-      if (response.ok) {
-        // Sucesso: Status 200
-        alert("Login bem-sucedido! Bem-vindo(a) de volta.");
-        console.log("Login OK:", data);
-
-        // 🎯 Ação de Sucesso: Redirecionar para o Dashboard
-        router.push("/dashboard");
-      } else {
-        // Erro: 401 (Credenciais Inválidas) ou outro erro de servidor
-        console.error("Erro no Login:", data.error);
-        alert(data.error || "Falha ao fazer login.");
-      }
-    } catch (error) {
-      console.error("Erro de conexão no servidor:", error);
-      alert("Erro de conexão. Verifique o servidor.");
-    } finally {
-      setIsLoading(false);
+    if (result?.error) {
+      // Se houver erro (Credenciais inválidas, etc.), exibe a mensagem do Auth.js
+      console.error("Login falhou:", result.error);
+      // Auth.js envia mensagens de erro na URL, vamos apenas exibir o erro.
+      setError(result.error || "Credenciais inválidas. Tente novamente.");
+    } else if (result?.ok) {
+      // Sucesso: Se a autenticação foi bem-sucedida, o Auth.js criou a sessão.
+      router.push("/dashboard"); // Redireciona para o Dashboard
     }
   };
 
@@ -68,6 +54,13 @@ function LoginForm() {
       <h2 className="text-3xl font-bold text-blue-400 mb-8 text-center">
         Acesse o Squadra
       </h2>
+
+      {/* Exibição de Erros */}
+      {error && (
+        <div className="bg-red-900 border border-red-700 text-sm p-3 rounded mb-4 text-red-100">
+          {error}
+        </div>
+      )}
 
       {/* Input: Email */}
       <div className="mb-4">
@@ -114,18 +107,24 @@ function LoginForm() {
         disabled={isLoading}
         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded w-full transition duration-200 disabled:bg-gray-500"
       >
-        {isLoading ? "Acessando..." : "Entrar"}
+        {isLoading ? "Verificando..." : "Entrar com Email e Senha"}
       </button>
 
-      {/* Link para o Cadastro */}
+      {/* Linha Divisória e Botão Social */}
+      <div className="my-5 flex items-center justify-between">
+        <span className="w-full border-t border-gray-700"></span>
+        <span className="text-gray-500 text-xs px-3">OU</span>
+        <span className="w-full border-t border-gray-700"></span>
+      </div>
+
+      <GoogleSignInButton />
+
       <p className="text-center text-sm text-gray-400 mt-4">
         Não tem conta?
         <a href="/register" className="text-blue-400 hover:underline ml-1">
           Cadastre-se
         </a>
       </p>
-      <p className="text-center text-sm text-gray-400 mt-4">Ou</p>
-      <GoogleSignInButton />
     </form>
   );
 }
